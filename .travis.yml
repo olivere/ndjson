@@ -11,6 +11,6 @@ matrix:
   - go: tip
 install:
 - go get -v ./...
-- go get github.com/google/go-cmp
+- go get github.com/google/go-cmp/cmp
 script:
 - go test -race -v ./...
