@@ -1,0 +1,15 @@
+language: go
+env:
+- GO111MODULE=on
+- GO111MODULE=off
+go:
+- "1.10.x"
+- "1.11.x"
+- "1.12.x"
+matrix:
+  allow_failures:
+  - go: tip
+install:
+- go get -v ./...
+script:
+- go test -race -v ./...
