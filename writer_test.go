@@ -4,11 +4,14 @@ import (
 	"bytes"
 	"strings"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestWriter(t *testing.T) {
 	type Doc struct {
-		ID int64 `json:"id"`
+		ID   int64  `json:"id"`
+		Text string `json:"text,omitempty"`
 	}
 
 	tests := []struct {
@@ -27,8 +30,19 @@ func TestWriter(t *testing.T) {
 				{ID: 1},
 				{ID: 2},
 			},
-			Output: []byte(`{"id":1}
-{"id":2}`),
+			Output: []byte("{\"id\":1}\n{\"id\":2}\n"),
+		},
+		// #2
+		{
+			Input: []Doc{
+				{ID: 1, Text: `A room
+with
+a
+newline
+`},
+				{ID: 2, Text: "No\tsuch\ntext\r\n\r\n"},
+			},
+			Output: []byte("{\"id\":1,\"text\":\"A room\\nwith\\na\\nnewline\\n\"}\n{\"id\":2,\"text\":\"No\\tsuch\\ntext\\r\\n\\r\\n\"}\n"),
 		},
 	}
 
@@ -44,6 +58,14 @@ func TestWriter(t *testing.T) {
 					t.Fatalf("#%d. want Error=~%q, have %q", i, want, have)
 				}
 			}
+		}
+		if want, have := tt.Output, out.Bytes(); !bytes.Equal(want, have) {
+			t.Fatalf("#%d. expected different Output:\nwant: %q\nhave: %q\ndiff: %v",
+				i,
+				string(want),
+				string(have),
+				cmp.Diff(string(want), string(have)),
+			)
 		}
 	}
 }

@@ -10,7 +10,8 @@ import (
 
 func TestReader(t *testing.T) {
 	type Doc struct {
-		ID int64 `json:"id"`
+		ID   int64  `json:"id"`
+		Text string `json:"text,omitempty"`
 	}
 
 	tests := []struct {
@@ -37,6 +38,18 @@ func TestReader(t *testing.T) {
 			Input:  []byte(`{"id":"abc"}`),
 			Output: nil,
 			Error:  "json: cannot unmarshal string into Go struct field",
+		},
+		// #3
+		{
+			Input: []byte("{\"id\":1,\"text\":\"A room\\nwith\\na\\nnewline\\n\"}\n{\"id\":2,\"text\":\"No\\tsuch\\ntext\\r\\n\\r\\n\"}\n"),
+			Output: []Doc{
+				{ID: 1, Text: `A room
+with
+a
+newline
+`},
+				{ID: 2, Text: "No\tsuch\ntext\r\n\r\n"},
+			},
 		},
 	}
 

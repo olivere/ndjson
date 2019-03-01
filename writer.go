@@ -28,8 +28,7 @@ func NewWriter(w io.Writer) *Writer {
 // bytes written. if n < len(p), it also returns an error explaining why
 // the write is short.
 func (w *Writer) Write(p []byte) (n int, err error) {
-	n, err = w.w.Write(p)
-	return 0, nil
+	return w.w.Write(p)
 }
 
 // Encode encodes v with a JSON encoder and writes the output to the

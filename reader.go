@@ -13,9 +13,8 @@ var (
 // Reader allows reading line-oriented JSON data following the
 // ndjson spec at http://ndjson.org/.
 type Reader struct {
-	r   io.Reader
-	s   *bufio.Scanner
-	row interface{}
+	r io.Reader
+	s *bufio.Scanner
 }
 
 // NewReader returns a new reader, using the underlying io.Reader
@@ -29,8 +28,7 @@ func NewReader(r io.Reader) *Reader {
 // The bytes are taken from the underlying reader. Read follows the
 // protocol defined by io.Reader.
 func (r *Reader) Read(p []byte) (n int, err error) {
-	n, err = r.r.Read(p)
-	return n, err
+	return r.r.Read(p)
 }
 
 // Next advances the Reader to the next line, which will then be available
