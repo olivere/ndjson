@@ -1,6 +1,6 @@
 # What is it?
 
-[![Build Status](https://travis-ci.org/olivere/ndjson.svg?branch=master)](https://travis-ci.org/olivere/ndjson)
+[![Build Status](https://github.com/olivere/ndjson/workflows/Test/badge.svg)](https://github.com/olivere/ndjson/actions)
 
 The `ndjson` package implements reading and writing files according
 to the [ndjson specification](http://ndjson.org/).
