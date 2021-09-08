@@ -24,6 +24,15 @@ func NewReader(r io.Reader) *Reader {
 	return &Reader{r: r, s: s}
 }
 
+// NewReaderSize returns a new reader whose buffer has the specified max size, using the underlying io.Reader
+// as input.
+func NewReaderSize(r io.Reader, maxSize int) *Reader {
+	s := bufio.NewScanner(r)
+	buf := make([]byte, 0, bufio.MaxScanTokenSize)
+	s.Buffer(buf, maxSize)
+	return &Reader{r: r, s: s}
+}
+
 // Read reads data into p. It returns the number of bytes read into p.
 // The bytes are taken from the underlying reader. Read follows the
 // protocol defined by io.Reader.
