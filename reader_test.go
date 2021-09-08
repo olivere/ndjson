@@ -2,11 +2,34 @@ package ndjson
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 )
+
+func text(size int) []byte {
+	letters := []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	buf := make([]byte, size)
+	for i := range buf {
+		buf[i] = letters[i%len(letters)]
+	}
+	return buf
+}
+
+func docs(sizes ...int) []byte {
+	var buf []byte
+	for i := 0; i < len(sizes); i++ {
+		if i > 0 {
+			buf = append(buf, '\n')
+		}
+		buf = append(buf, fmt.Sprintf(`{"id":%d,"text":"`, i+1)...)
+		buf = append(buf, text(sizes[i])...)
+		buf = append(buf, `"}`...)
+	}
+	return buf
+}
 
 func TestReader(t *testing.T) {
 	type Doc struct {
@@ -51,6 +74,12 @@ newline
 				{ID: 2, Text: "No\tsuch\ntext\r\n\r\n"},
 			},
 		},
+		// #4
+		{
+			Input: docs(128*1024),
+			Output: nil,
+			Error: "bufio.Scanner: token too long",
+		},
 	}
 
 	for i, tt := range tests {
@@ -80,5 +109,35 @@ newline
 				t.Fatalf("#%d. want Error=~%q, have %q", i, want, have)
 			}
 		}
+	}
+}
+
+func TestReaderSize(t *testing.T) {
+	type Doc struct {
+		ID   int64  `json:"id"`
+		Text string `json:"text,omitempty"`
+	}
+
+	input := docs(128*1024, 10)
+	output := []Doc{
+		{ID: 1, Text: string(text(128*1024))},
+		{ID: 2, Text: string(text(10))},
+	}
+
+	r := NewReaderSize(bytes.NewReader(input), 256*1024)
+	var n int
+	for r.Next() {
+		var doc Doc
+		if err := r.Decode(&doc); err != nil {
+			t.Fatalf("expected no error, got %v", err)
+		} else {
+			if want, have := output[n], doc; !cmp.Equal(want, have) {
+				t.Fatalf("want Doc=%v, have %v", want, cmp.Diff(want, have))
+			}
+		}
+		n++
+	}
+	if err := r.Err(); err != nil {
+		t.Fatalf("expected no error, got %v", err)
 	}
 }
