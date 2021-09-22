@@ -34,6 +34,27 @@ func ExampleReader() {
 	// London
 }
 
+func ExampleReader_Bytes() {
+	r := ndjson.NewReader(strings.NewReader(`{"city":"Munich"}
+{"city":"Invalid"
+{"city":"London"}`))
+	for r.Next() {
+		var loc Location
+		if err := r.Decode(&loc); err != nil {
+			fmt.Printf("Decode failed: %v. Last read: %s\n", err, string(r.Bytes()))
+			return
+		}
+		fmt.Println(loc.City)
+	}
+	if err := r.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "Reader failed: %v", err)
+		return
+	}
+	// Output:
+	// Munich
+	// Decode failed: unexpected end of JSON input. Last read: {"city":"Invalid"
+}
+
 func ExampleWriter() {
 	locations := []Location{
 		{City: "Munich"},
