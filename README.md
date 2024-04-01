@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/olivere/ndjson/workflows/Test/badge.svg)](https://github.com/olivere/ndjson/actions)
 
 The `ndjson` package implements reading and writing files according
-to the [ndjson specification](http://ndjson.org/).
+to the [ndjson specification](https://github.com/ndjson/ndjson-spec/).
 
 Example:
 
