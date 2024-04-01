@@ -10,7 +10,7 @@ var (
 )
 
 // Writer implements writing line-oriented JSON data following the
-// ndjson spec at http://ndjson.org/.
+// ndjson spec at https://github.com/ndjson/ndjson-spec/.
 type Writer struct {
 	w   io.Writer
 	enc *json.Encoder

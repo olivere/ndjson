@@ -11,7 +11,7 @@ var (
 )
 
 // Reader allows reading line-oriented JSON data following the
-// ndjson spec at http://ndjson.org/.
+// ndjson spec at https://github.com/ndjson/ndjson-spec/.
 type Reader struct {
 	r io.Reader
 	s *bufio.Scanner
