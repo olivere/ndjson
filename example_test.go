@@ -1,6 +1,7 @@
 package ndjson_test
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"strings"
@@ -10,6 +11,10 @@ import (
 
 type Location struct {
 	City string `json:"city"`
+}
+
+type collection struct {
+	Index map[string]interface{} `json:"index"`
 }
 
 func ExampleReader() {
@@ -73,3 +78,33 @@ func ExampleWriter() {
 	// {"city":"Berlin"}
 	// {"city":"London"}
 }
+
+func ExampleWriter_zincSearch() {
+	locations := []Location{
+		{City: "Munich"},
+	}
+
+	index := map[string]interface{}{"_index": "States"}
+	collections := []collection{{Index: index}}
+
+	var buf bytes.Buffer
+	r := ndjson.NewWriter(&buf)
+
+	for _, c := range collections {
+		if err := r.Encode(c); err != nil {
+			fmt.Fprintf(os.Stderr, "Encode failed: %v", err)
+			return
+		}
+	}
+
+	for _, loc := range locations {
+		if err := r.Encode(loc); err != nil {
+			fmt.Fprintf(os.Stderr, "Encode failed: %v", err)
+			return
+		}
+	}
+}
+
+// Output:
+// { "index" : { "_index" : "States" } }
+// {"city":"Munich"}
